@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-image: url('https://casinoex.org/wp-content/uploads/2020/08/blackjack-igra2.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      margin: 0;
+      padding: 0;
+    }
+
+    .slot-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .slot-row {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    img {
+      width: 100px;
+      height: 100px;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    #spinButton {
+      margin-top: 20px;
+      padding: 15px 30px;
+      cursor: pointer;
+      font-size: 18px;
+      background-color: rgb(58, 177, 62);
+      color: white;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    #spinButton:hover {
+      background-color: #000000; 
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      background-color: rgba(234, 227, 227, 0.5);
+      padding: 10px;
+      border-radius: 5px;
+      width: 300px;
+      margin: 0 auto;
+    }
+    #fireworks-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .firework {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: #FFD700;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: explode 1s ease-out infinite;
+    }
+
+    @keyframes explode {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(0.1);
+        opacity: 0;
+      }
+    }
+
+    @media screen and (max-width: 600px) {
+      img {
+        width: 7.5rem;
+        height: 7rem;
+      }
+
+      #spinButton {
+        font-size: 34px;
+        padding: 30px 20px;
+      }
+
+      #result {
+        font-size: 24px;
+        width: 80%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="result"></div>
+  <div class="slot-container"></div>
+  <div id="spinButton">Крутити</div>
+  <div id="fireworks-container"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      let playerName = prompt("Введіть своє ім'я:");
+
+      const images = {
+        'card1': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Atlas_deck_6_of_spades.svg/800px-Atlas_deck_6_of_spades.svg.png',
+        'card2': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Atlas_deck_7_of_spades.svg/360px-Atlas_deck_7_of_spades.svg.png',
+        'card3': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Atlas_deck_8_of_spades.svg/1200px-Atlas_deck_8_of_spades.svg.png',
+        'card4': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Atlas_deck_9_of_spades.svg/1365px-Atlas_deck_9_of_spades.svg.png',
+        'card5': 'https://upload.wikimedia.org/wikipedia/commons/9/91/Atlas_deck_10_of_spades.svg',
+        'card6': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Aceofspades.svg/1200px-Aceofspades.svg.png',
+        'card7': 'https://upload.wikimedia.org/wikipedia/commons/3/3e/%D0%90%D1%82%D0%BB%D0%B0%D1%81%D0%BD%D0%B0%D1%8F_%D0%BA%D0%BE%D0%BB%D0%BE%D0%B4%D0%B0_%D1%8D%D0%BA%D1%81%D1%82%D1%80%D0%B0_%D0%B2%D0%B0%D0%BB%D0%B5%D1%82_%D1%87%D0%B5%D1%80%D0%B2%D0%B8.jpg',
+        'card8': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJbnE2Di6mewdLDwP_E-thfgMw7A8HikhdKc7Or_ad5NaUrfGWRGKsVtd-VdGG9wh2rjs&usqp=CAU',
+        'card9': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/%D0%90%D1%82%D0%BB%D0%B0%D1%81%D0%BD%D0%B0%D1%8F_%D0%BA%D0%BE%D0%BB%D0%BE%D0%B4%D0%B0_%D0%BA%D0%BE%D1%80%D0%BE%D0%BB%D1%8C_%D1%8D%D0%BA%D1%81%D1%82%D1%80%D0%B0_%D1%82%D1%80%D0%B5%D1%84%D1%8B.jpg/167px-%D0%90%D1%82%D0%BB%D0%B0%D1%81%D0%BD%D0%B0%D1%8F_%D0%BA%D0%BE%D0%BB%D0%BE%D0%B4%D0%B0_%D0%BA%D0%BE%D1%80%D0%BE%D0%BB%D1%8C_%D1%8D%D0%BA%D1%81%D1%82%D1%80%D0%B0_%D1%82%D1%80%D0%B5%D1%84%D1%8B.jpg',
+      };
+      let attempts = 0;
+
+      function getRandomImage() {
+        return Object.keys(images)[Math.floor(Math.random() * Object.keys(images).length)];
+      }
+
+      function createSlotRow() {
+        let row = document.createElement('div');
+        row.classList.add('slot-row');
+        for (let i = 0; i < 3; i++) {
+          let image = getRandomImage();
+          let img = document.createElement('img');
+          img.src = images[image];
+          img.alt = 'playing card';
+          row.appendChild(img);
+        }
+        return row;
+      }
+
+      function checkWin(rows) {
+        for (let i = 0; i < 3; i++) {
+          if (
+            rows[i].children[0].src === rows[i].children[1].src &&
+            rows[i].children[1].src === rows[i].children[2].src
+          ) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function spinAnimation() {
+        let images = document.querySelectorAll('.slot-row img');
+        images.forEach(function (img) {
+          img.style.transition = 'transform 0.5s ease-in-out';
+          img.style.transform = 'rotate(360deg)';
+        });
+
+        setTimeout(function () {
+          images.forEach(function (img) {
+            img.style.transition = 'none';
+            img.style.transform = 'rotate(0deg)';
+          });
+        }, 500);
+      }
+
+      function displayFireworks() {
+        const container = document.getElementById("fireworks-container");
+        for (let i = 0; i < 250; i++) {
+          const x = Math.random() * window.innerWidth;
+          const y = Math.random() * window.innerHeight;
+          const firework = document.createElement("div");
+          firework.className = "firework";
+          firework.style.left = `${x}px`;
+          firework.style.top = `${y}px`;
+          container.appendChild(firework);
+        }
+      }
+
+      function playGame() {
+        let spinButton = document.getElementById('spinButton');
+        spinButton.addEventListener('click', function () {
+
+          var slotContainer = document.querySelector('.slot-container');
+          slotContainer.innerHTML = '';
+
+          for (let i = 0; i < 3; i++) {
+            let slotRow = createSlotRow();
+            slotContainer.appendChild(slotRow);
+          }
+
+          spinAnimation();
+
+          setTimeout(function () {
+            let rows = document.querySelectorAll('.slot-row');
+            attempts++;
+
+            let resultDiv = document.getElementById('result');
+            resultDiv.textContent = 'Спроба ' + attempts + '/3';
+
+            if (checkWin(rows)) {
+              resultDiv.innerHTML += '<br>Вітаємо, ' + playerName + '! Ви перемогли!';
+              displayFireworks(); 
+              setTimeout(() => {
+               location.reload(); 
+                 }, 5000);
+            } else if (attempts === 3) {
+              resultDiv.innerHTML += '<br>Програш! Спробуйте ще раз, ' + playerName + '.';
+              attempts = 0;
+            }
+          }, 1000);
+        });
+      }
+      
+
+      playGame();
+      
+    });
+  </script>
+
+</body>
+
+</html>
